@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { CreateUserDto } from './dtos/create-user.dto';
 import { Status, User } from './user.model';
 
 @Injectable()
@@ -19,7 +20,7 @@ export class UsersService {
 
   constructor() {}
 
-  get(id: number): User {
+  getById(id: number): User {
     return this.userList.find((x) => x.id === id);
   }
 
@@ -27,9 +28,14 @@ export class UsersService {
     return this.userList;
   }
 
-  add(data: User): User {
-    data.id = ++this.idCount;
-    this.userList.push(data);
-    return this.get(data.id);
+  add(data: CreateUserDto): User {
+    const { email, status } = data;
+    const user: User = {
+      id: ++this.idCount,
+      email: email,
+      status: status,
+    };
+    this.userList.push(user);
+    return this.getById(user.id);
   }
 }
