@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { Status, User } from './user.model';
 
@@ -21,7 +21,11 @@ export class UsersService {
   constructor() {}
 
   getById(id: number): User {
-    return this.userList.find((x) => x.id === id);
+    const user = this.userList.find((x) => x.id === id);
+    if (!user) {
+      throw new NotFoundException();
+    }
+    return user;
   }
 
   getAll(): User[] {
