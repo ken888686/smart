@@ -1,0 +1,26 @@
+name: Docker Compose CI
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: isbang/compose-action@v1.5.1
+        with:
+          compose-file: "./compose.yaml"
+          up-flags: "--build"
+          down-flags: "--volumes"
+        env:
+          MARIADB_ROOT_HOST: ${{ secrets.MARIADB_ROOT_HOST }}
+          MARIADB_DATABASE: ${{ secrets.MARIADB_DATABASE }}
+          MARIADB_USER: ${{ secrets.MARIADB_USER }}
+          MARIADB_PASSWORD: ${{ secrets.MARIADB_PASSWORD }}
+          MARIADB_ROOT_PASSWORD: ${{ secrets.MARIADB_ROOT_PASSWORD }}
+          MARIADB_HOST: ${{ secrets.MARIADB_HOST }}
+          MARIADB_PORT: ${{ secrets.MARIADB_PORT }}

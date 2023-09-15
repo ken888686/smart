@@ -1,5 +1,10 @@
 volumes:
   db_data:
+secrets:
+  root_password:
+    file: ./db/root_password.txt
+  user_password:
+    file: ./db/user_password.txt
 networks:
   smart:
 
@@ -10,11 +15,11 @@ services:
       context: ./api
       dockerfile: Dockerfile
     environment:
-      MARIADB_HOST: ${MARIADB_HOST}
-      MARIADB_DATABASE: ${MARIADB_DATABASE}
-      MARIADB_PORT: ${MARIADB_PORT}
-      MARIADB_USER: ${MARIADB_USER}
-      MARIADB_PASSWORD: ${MARIADB_PASSWORD}
+      MARIADB_HOST: db
+      MARIADB_DATABASE: smartDB
+      MARIADB_PORT: 3306
+      MARIADB_USER: donald
+      MARIADB_PASSWORD: password
     ports:
       - 3001:3001
     depends_on:
@@ -24,15 +29,18 @@ services:
     container_name: db
     image: mariadb:lts
     restart: always
+    secrets:
+      - root_password
+      - user_password
     volumes:
       - db_data:/var/lib/mysql
       - ./db/sqls:/docker-entrypoint-initdb.d
     environment:
-      MARIADB_ROOT_HOST: ${MARIADB_ROOT_HOST}
-      MARIADB_DATABASE: ${MARIADB_DATABASE}
-      MARIADB_USER: ${MARIADB_USER}
-      MARIADB_PASSWORD: ${MARIADB_PASSWORD}
-      MARIADB_ROOT_PASSWORD: ${MARIADB_ROOT_PASSWORD}
+      MARIADB_ROOT_HOST: localhost
+      MARIADB_DATABASE: smartDB
+      MARIADB_USER: donald
+      MARIADB_PASSWORD_FILE: /run/secrets/user_password
+      MARIADB_ROOT_PASSWORD_FILE: /run/secrets/root_password
       TZ: Asia/Singapore
     ports:
       - 3306:3306
