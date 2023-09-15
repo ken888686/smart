@@ -1,45 +1,36 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { CreateUserDto } from './dtos/create-user.dto';
-import { Status, User } from './user.model';
+import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { CreateUserDto } from './dto/create-user.dto';
+import { User } from './entities/user.entity';
 
 @Injectable()
 export class UsersService {
-  private userList: User[] = [
-    {
-      id: 1,
-      email: 'ken888686@gmail.com',
-      status: Status.ENABLED,
-    },
-    {
-      id: 2,
-      email: 'ken666868@hotmail.com',
-      status: Status.ENABLED,
-    },
-  ];
-  private idCount = this.userList.length;
+  constructor(
+    @InjectRepository(User)
+    private usersRepository: Repository<User>,
+  ) {}
 
-  constructor() {}
+  async create(createUserDto: CreateUserDto) {
+    const res: User = await this.usersRepository.save(createUserDto);
+    console.log(res);
+    return 'This action adds a new user';
+  }
 
-  getById(id: number): User {
-    const user = this.userList.find((x) => x.id === id);
-    if (!user) {
-      throw new NotFoundException();
-    }
+  async findAll() {
+    return await this.usersRepository.find();
+  }
+
+  async findOne(id: number) {
+    const user = await this.usersRepository.findOneBy({ id });
     return user;
   }
 
-  getAll(): User[] {
-    return this.userList;
-  }
+  // update(id: number, updateUserDto: UpdateUserDto) {
+  //   return `This action updates a #${id} user`;
+  // }
 
-  add(data: CreateUserDto): User {
-    const { email, status } = data;
-    const user: User = {
-      id: ++this.idCount,
-      email: email,
-      status: status,
-    };
-    this.userList.push(user);
-    return this.getById(user.id);
-  }
+  // remove(id: number) {
+  //   return `This action removes a #${id} user`;
+  // }
 }
